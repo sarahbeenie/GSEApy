@@ -425,8 +425,7 @@ def gsea_compute_tensor(data, gmt, n, weighted_score_type, permutation_type,
     # concate results
     es, esnull, RES = np.hstack(es), np.vstack(esnull), np.vstack(RES)
 
-    return gsea_significance(es, esnull), hit_ind, RES, subsets
-
+    return gsea_significance(es, esnull), es, esnull, nEnrichmentNulls, hit_ind, RES, subsets
 
 
 def gsea_compute(data, gmt, n, weighted_score_type, permutation_type,
@@ -649,24 +648,24 @@ def gsea_significance(enrichment_scores, enrichment_nulls):
     # warnings.simplefilter("ignore")
     es = np.array(enrichment_scores)
     esnull = np.array(enrichment_nulls)
-    logging.debug("Start to compute pvals..................................")
+    # logging.debug("Start to compute pvals..................................")
     # P-values.
-    pvals = gsea_pval(es, esnull).tolist()
+    # pvals = gsea_pval(es, esnull).tolist()
 
-    logging.debug("Start to compute nes and nesnull........................")
+    # logging.debug("Start to compute nes and nesnull........................")
     # NES
     nEnrichmentScores, nEnrichmentNulls = normalize(es, esnull)
 
-    logging.debug("Start to compute fdrs..................................")
+    # logging.debug("Start to compute fdrs..................................")
     # FDR
-    fdrs = gsea_fdr(nEnrichmentScores, nEnrichmentNulls)
+    # fdrs = gsea_fdr(nEnrichmentScores, nEnrichmentNulls)
 
     #TODO: use multiple testing correction for ssgsea? ssGSEA2.0 use BH correction.
     # https://github.com/broadinstitute/ssGSEA2.0/blob/master/src/ssGSEA2.0.R
     # line 969
     # fdrs, _ = multiple_testing_correction(pvals, alpha=0.05)
 
-    return zip(enrichment_scores, nEnrichmentScores, pvals, fdrs)
+    return zip(enrichment_scores, nEnrichmentScores), es, esnull, nEnrichmentNulls
 
 
 
