@@ -385,7 +385,8 @@ def gsea_compute_tensor(data, gmt, n, weighted_score_type, permutation_type,
         # convert to tuple
         genes_mat = (data.index.values, genes_ind)
 
-    logging.debug("Start to compute es and esnulls........................")
+    logging.info("Start to compute es and esnulls........................")
+
     # Prerank, ssGSEA, GSEA
     es = []
     RES = []
@@ -424,6 +425,8 @@ def gsea_compute_tensor(data, gmt, n, weighted_score_type, permutation_type,
         hit_ind += hit
     # concate results
     es, esnull, RES = np.hstack(es), np.vstack(esnull), np.vstack(RES)
+
+    logging.info("Done computing es and esnulls........................")
 
     return gsea_significance(es, esnull), es, esnull, nEnrichmentNulls, hit_ind, RES, subsets
 
