@@ -285,7 +285,9 @@ class GSEAbase(object):
             rdict['pval'] = gseale[2]
             rdict['fdr'] = gseale[3]
             rdict['enrichment_scores'] = gseale[4]
-            rdict['enrichment_nulls'] = gseale[5]
+            rdict['esnull'] = gseale[5]
+            rdict['enrichment_nulls'] = gseale[6]
+            rdict['nenrichment_nulls'] = gseale[7]
             rdict['geneset_size'] = len(gmt[gs])
             rdict['matched_size'] = len(ind)
             # reformat gene list.
