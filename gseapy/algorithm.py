@@ -428,7 +428,7 @@ def gsea_compute_tensor(data, gmt, n, weighted_score_type, permutation_type,
 
     logging.info("Done computing es and esnulls........................")
 
-    return gsea_significance(es, esnull), hit_ind, RES, subsets
+    return gsea_significance(es, esnull), hit_ind, RES, subsets, es, esnull
 
 
 def gsea_compute(data, gmt, n, weighted_score_type, permutation_type,
@@ -667,4 +667,4 @@ def gsea_significance(enrichment_scores, enrichment_nulls):
     # line 969
     # fdrs, _ = multiple_testing_correction(pvals, alpha=0.05)
 
-    return zip(enrichment_scores, nEnrichmentScores, pvals, fdrs, es, esnull, enrichment_nulls, nEnrichmentNulls)
+    return zip(enrichment_scores, nEnrichmentScores, pvals, fdrs), es, esnull

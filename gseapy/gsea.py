@@ -437,7 +437,7 @@ class GSEA(GSEAbase):
         self._set_cores()
         # compute ES, NES, pval, FDR, RES
         dataset = dat if self.permutation_type == 'phenotype' else dat2
-        gsea_results,hit_ind,rank_ES, subsets = gsea_compute_tensor(data=dataset, gmt=gmt, n=self.permutation_num,
+        gsea_results,hit_ind,rank_ES, subsets, es, esnull = gsea_compute_tensor(data=dataset, gmt=gmt, n=self.permutation_num,
                                                                       weighted_score_type=self.weighted_score_type,
                                                                       permutation_type=self.permutation_type,
                                                                       method=self.method,
@@ -464,7 +464,7 @@ class GSEA(GSEAbase):
         if self._outdir is None:
             self._tmpdir.cleanup()
 
-        return gsea_results
+        return gsea_results, es, esnull
 
 
 def gsea(data, gene_sets, cls, outdir='GSEA_', min_size=15, max_size=500, permutation_num=1000,
