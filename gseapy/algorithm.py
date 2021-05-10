@@ -667,4 +667,4 @@ def gsea_significance(enrichment_scores, enrichment_nulls):
     # line 969
     # fdrs, _ = multiple_testing_correction(pvals, alpha=0.05)
 
-    return zip(enrichment_scores, nEnrichmentScores, pvals, fdrs), es, esnull
+    return zip(enrichment_scores, nEnrichmentScores, pvals, fdrs)

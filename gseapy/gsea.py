@@ -140,7 +140,7 @@ class GSEAbase(object):
 
         filsets_num = len(subsets) - len(genesets_dict)
         self._logger.info("%04d gene_sets have been filtered out when max_size=%s and min_size=%s" % (
-        filsets_num, self.max_size, self.min_size))
+            filsets_num, self.max_size, self.min_size))
 
         if filsets_num == len(subsets):
             self._logger.error("No gene sets passed through filtering condition!!!, try new parameters again!\n" + \
@@ -274,9 +274,8 @@ class GSEAbase(object):
         # pool.close()
         # pool.join()
 
-    def _save_results(self, zipdata, outdir, module, gmt, rank_metric, permutation_type):
+    def _save_results(self, zipdata, es, esnull, outdir, module, gmt, rank_metric, permutation_type):
         """reformat gsea results, and save to txt"""
-
         res = OrderedDict()
         for gs, gseale, ind, RES in zipdata:
             rdict = OrderedDict()
@@ -284,10 +283,6 @@ class GSEAbase(object):
             rdict['nes'] = gseale[1]
             rdict['pval'] = gseale[2]
             rdict['fdr'] = gseale[3]
-            rdict['enrichment_scores'] = gseale[4]
-            rdict['esnull'] = gseale[5]
-            rdict['enrichment_nulls'] = gseale[6]
-            rdict['nenrichment_nulls'] = gseale[7]
             rdict['geneset_size'] = len(gmt[gs])
             rdict['matched_size'] = len(ind)
             # reformat gene list.
@@ -319,6 +314,8 @@ class GSEAbase(object):
         res_df.drop(['RES', 'hit_indices'], axis=1, inplace=True)
         res_df.sort_values(by=['fdr', 'pval'], inplace=True)
         self.res2d = res_df
+        self.es = es
+        self.esnull = esnull
 
         if self._outdir is None: return
         out = os.path.join(outdir, 'gseapy.{b}.{c}.report.csv'.format(b=module, c=permutation_type))
@@ -437,18 +434,22 @@ class GSEA(GSEAbase):
         self._set_cores()
         # compute ES, NES, pval, FDR, RES
         dataset = dat if self.permutation_type == 'phenotype' else dat2
-        gsea_results,hit_ind,rank_ES, subsets, es, esnull = gsea_compute_tensor(data=dataset, gmt=gmt, n=self.permutation_num,
-                                                                      weighted_score_type=self.weighted_score_type,
-                                                                      permutation_type=self.permutation_type,
-                                                                      method=self.method,
-                                                                      pheno_pos=phenoPos, pheno_neg=phenoNeg,
-                                                                      classes=cls_vector, ascending=self.ascending,
-                                                                      processes=self._processes, seed=self.seed)
+        gsea_results, hit_ind, rank_ES, subsets, es, esnull = gsea_compute_tensor(data=dataset, gmt=gmt,
+                                                                                  n=self.permutation_num,
+                                                                                  weighted_score_type=self.weighted_score_type,
+                                                                                  permutation_type=self.permutation_type,
+                                                                                  method=self.method,
+                                                                                  pheno_pos=phenoPos,
+                                                                                  pheno_neg=phenoNeg,
+                                                                                  classes=cls_vector,
+                                                                                  ascending=self.ascending,
+                                                                                  processes=self._processes,
+                                                                                  seed=self.seed)
 
         self._logger.info("Start to generate GSEApy reports and figures............")
         res_zip = zip(subsets, list(gsea_results), hit_ind, rank_ES)
-        self._save_results(zipdata=res_zip, outdir=self.outdir, module=self.module,
-                                   gmt=gmt, rank_metric=dat2, permutation_type=self.permutation_type)
+        self._save_results(zipdata=res_zip, es=es, esnull=esnull, outdir=self.outdir, module=self.module,
+                           gmt=gmt, rank_metric=dat2, permutation_type=self.permutation_type)
 
         # reorder dataframe for heatmap
         self._heatmat(df=dat.loc[dat2.index], classes=cls_vector,
@@ -464,7 +465,7 @@ class GSEA(GSEAbase):
         if self._outdir is None:
             self._tmpdir.cleanup()
 
-        return gsea_results, es, esnull
+        return
 
 
 def gsea(data, gene_sets, cls, outdir='GSEA_', min_size=15, max_size=500, permutation_num=1000,
