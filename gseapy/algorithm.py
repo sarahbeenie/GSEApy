@@ -640,7 +640,6 @@ def gsea_fdr(nEnrichmentScores, nEnrichmentNulls):
 
 def gsea_significance(enrichment_scores, enrichment_nulls):
     """Compute nominal pvals, normalized ES, and FDR q value.
-
         For a given NES(S) = NES* >= 0. The FDR is the ratio of the percentage of all (S,pi) with
         NES(S,pi) >= 0, whose NES(S,pi) >= NES*, divided by the percentage of
         observed S wih NES(S) >= 0, whose NES(S) >= NES*, and similarly if NES(S) = NES* <= 0.
@@ -651,25 +650,21 @@ def gsea_significance(enrichment_scores, enrichment_nulls):
     # warnings.simplefilter("ignore")
     es = np.array(enrichment_scores)
     esnull = np.array(enrichment_nulls)
-    # logging.debug("Start to compute pvals..................................")
+    logging.info("Start to compute pvals..................................")
     # P-values.
-    # pvals = gsea_pval(es, esnull).tolist()
+    pvals = gsea_pval(es, esnull).tolist()
 
-    # logging.debug("Start to compute nes and nesnull........................")
+    logging.debug("Start to compute nes and nesnull........................")
     # NES
     nEnrichmentScores, nEnrichmentNulls = normalize(es, esnull)
 
-    # logging.debug("Start to compute fdrs..................................")
+    logging.info("Start to compute fdrs..................................")
     # FDR
-    # fdrs = gsea_fdr(nEnrichmentScores, nEnrichmentNulls)
+    fdrs = gsea_fdr(nEnrichmentScores, nEnrichmentNulls)
 
     #TODO: use multiple testing correction for ssgsea? ssGSEA2.0 use BH correction.
     # https://github.com/broadinstitute/ssGSEA2.0/blob/master/src/ssGSEA2.0.R
     # line 969
     # fdrs, _ = multiple_testing_correction(pvals, alpha=0.05)
 
-    return zip(enrichment_scores, nEnrichmentScores), es, esnull, nEnrichmentNulls
-
-
-
-
+    return zip(enrichment_scores, nEnrichmentScores, pvals, fdrs, enrichment_scores, enrichment_nulls)
